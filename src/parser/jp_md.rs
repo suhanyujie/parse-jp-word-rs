@@ -1,6 +1,6 @@
 use nom::sequence::{preceded, Tuple};
 use nom::character::complete::{char, line_ending, not_line_ending, space1};
-use nom::{IResult, Parser};
+use nom::{IResult, Parser, Err, error_position};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::combinator::opt;
@@ -28,7 +28,7 @@ pub fn parts_word1(input: &str) -> IResult<&str, &str> {
     Ok((&input[index..], &input[..index]))
 }
 
-pub fn jp_str(input: &str) -> IResult<&str, String> {
+pub fn jp_string(input: &str) -> IResult<&str, String> {
     let mut index = 0;
     let mut it1 = input.chars();
     while let Some(c) = it1.next() {
@@ -36,6 +36,12 @@ pub fn jp_str(input: &str) -> IResult<&str, String> {
             break;
         }
         index += c.len_utf8();
+    }
+    if index == 0 {
+        return Err(nom::Err::Error(nom::error::Error::new(
+            input,
+            nom::error::ErrorKind::Fail,
+        )));
     }
     let res = (&input[..index]).to_string();
     Ok((&input[index..], res))

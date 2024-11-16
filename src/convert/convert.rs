@@ -1,10 +1,10 @@
 use nom::sequence::{preceded, Tuple};
 use nom::bytes::complete::{tag, take_until};
 use nom::{IResult, Parser};
-use nom::branch::alt;
+use nom::branch::{alt, permutation};
 use nom::combinator::complete;
 use nom::multi::{many0, many1};
-use crate::parser::jp_md::{jp_str, parts_word1};
+use crate::parser::jp_md::{jp_string, parts_word1};
 use crate::prelude::*;
 
 // word: {一応|いちおう}
@@ -22,7 +22,7 @@ pub fn convert_one_word_with_ann(word_str: &str) -> IResult<&str, String> {
 
 // word: `何が{一応|いちおう}ですか？`
 pub fn convert_one_word_with_ann_and_extra_str(word_str: &str) -> IResult<&str, Vec<String>> {
-    let (input, list) = many0(alt((jp_str, convert_one_word_with_ann))).parse(word_str)?;
+    let (input, list) = many1(alt((jp_string, convert_one_word_with_ann))).parse(word_str)?;
     Ok((input, list))
 }
 
@@ -38,7 +38,11 @@ mod tests {
 
     #[test]
     fn test_convert_one_word_with_ann_and_extra_str() {
-        let res = convert_one_word_with_ann_and_extra_str("何が{一応|いちおう}ですか");
-        println!("{:?}", res);
+        // {一応|いちおう}{一応|いちおう}ですか
+        if let Ok((i, list)) = convert_one_word_with_ann_and_extra_str("一応{一応|いちおう}いち{一応|いちおう}") {
+            println!("{:?}", list);
+        } else {
+            assert!(false);
+        }
     }
 }
