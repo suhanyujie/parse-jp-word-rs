@@ -28,6 +28,19 @@ pub fn parts_word1(input: &str) -> IResult<&str, &str> {
     Ok((&input[index..], &input[..index]))
 }
 
+pub fn jp_str(input: &str) -> IResult<&str, String> {
+    let mut index = 0;
+    let mut it1 = input.chars();
+    while let Some(c) = it1.next() {
+        if !c.is_jp_char() {
+            break;
+        }
+        index += c.len_utf8();
+    }
+    let res = (&input[..index]).to_string();
+    Ok((&input[index..], res))
+}
+
 pub fn parts_meaning(input: &str) -> IResult<&str, (&str, &str)> {
     (not_line_ending, line_ending).parse(input)
 }
