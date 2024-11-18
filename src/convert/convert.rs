@@ -1,11 +1,11 @@
 use nom::sequence::{preceded, Tuple};
 use nom::bytes::complete::{tag, take_until};
 use nom::{IResult, Parser};
-use nom::branch::{alt, permutation};
-use nom::combinator::complete;
+use nom::branch::{alt};
 use nom::multi::{many0, many1};
-use crate::parser::jp_md::{jp_string, parts_word1};
+use crate::parser::jp_md::{jp_string};
 use crate::prelude::*;
+use markdown::to_html;
 
 // word: {一応|いちおう}
 // convert into ruby html string
@@ -21,9 +21,15 @@ pub fn convert_one_word_with_ann(word_str: &str) -> IResult<&str, String> {
 }
 
 // word: `何が{一応|いちおう}ですか？`
-pub fn convert_one_word_with_ann_and_extra_str(word_str: &str) -> IResult<&str, Vec<String>> {
+pub fn convert_one_word_with_ann_and_extra_str(word_str: &str) -> IResult<&str, String> {
     let (input, list) = many1(alt((jp_string, convert_one_word_with_ann))).parse(word_str)?;
-    Ok((input, list))
+    let s = list.iter().fold(String::new(), |mut acc, d| acc + &d.to_string());
+    Ok((input, s))
+}
+
+pub fn one_line_to_html(input: &str) -> Result<String> {
+    let html_str = to_html(input);
+    Ok(html_str)
 }
 
 #[cfg(test)]
@@ -39,10 +45,17 @@ mod tests {
     #[test]
     fn test_convert_one_word_with_ann_and_extra_str() {
         // {一応|いちおう}{一応|いちおう}ですか
-        if let Ok((i, list)) = convert_one_word_with_ann_and_extra_str("一応{一応|いちおう}いち{一応|いちおう}") {
-            println!("{:?}", list);
+        if let Ok((i, s)) = convert_one_word_with_ann_and_extra_str("一応{一応|いちおう}いち{一応|いちおう}") {
+            println!("{:?}", s);
         } else {
             assert!(false);
         }
+    }
+
+    #[test]
+    fn test_one_line_to_html() {
+        let input = "[名] 看清，看透。";
+        let res = one_line_to_html(input);
+        println!("{:?}", res);
     }
 }

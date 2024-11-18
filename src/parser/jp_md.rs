@@ -6,6 +6,7 @@ use nom::bytes::complete::{tag, take_until};
 use nom::combinator::opt;
 use nom::multi::{many0, many1};
 use nom::sequence::{delimited, pair};
+use crate::convert::convert::{convert_one_word_with_ann_and_extra_str, one_line_to_html};
 use crate::parser::parser::*;
 
 fn item_one_line(input: &str) -> IResult<&str, &str> {
@@ -70,9 +71,31 @@ pub fn markdown_link(input: &str) -> IResult<&str, (&str, &str)> {
 // 定义一个结构体来存储解析出的单词和解释
 #[derive(Debug)]
 pub struct WordExplanation {
+    pub is_converted: bool,
     pub word: String,
     pub explanation: String,
     pub sub_items: Vec<String>,
+}
+
+impl Default for WordExplanation {
+    fn default() -> Self {
+        Self {
+            is_converted: false,
+            word: "".to_string(),
+            explanation: "".to_string(),
+            sub_items: vec![],
+        }
+    }
+}
+
+impl WordExplanation {
+    // 转换单词，及其“意思”为 html
+    pub fn convert(&mut self) {
+        self.word = convert_one_word_with_ann_and_extra_str(self.word.as_str()).and_then(|(_, s)| Ok(s)).unwrap_or_default();
+        self.explanation = one_line_to_html(self.explanation.as_str()).unwrap_or_default();
+        let new_subs: Vec<String> = self.sub_items.iter().map(|item| { one_line_to_html(&item).unwrap() }).collect();
+        self.sub_items = new_subs;
+    }
 }
 
 // 解析每个条目，例如：`- クーラー：空调，冷气设备`
@@ -92,6 +115,7 @@ pub fn parse_entry(input: &str) -> IResult<&str, WordExplanation> {
             word: word.to_string(),
             explanation: explanation.to_string(),
             sub_items: sub_items.unwrap_or_default(),
+            ..WordExplanation::default()
         },
     ))
 }
