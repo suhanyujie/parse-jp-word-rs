@@ -142,8 +142,9 @@ pub fn parse_items(input: &str) -> IResult<&str, Vec<WordExplanation>> {
 }
 
 
-trait CharJpExt {
+pub trait CharJpExt {
     fn is_jp_char(&self) -> bool;
+    fn is_kanji(&self) -> bool;
 }
 
 impl CharJpExt for char {
@@ -154,6 +155,14 @@ impl CharJpExt for char {
             | '\u{3000}'..='\u{303F}' // 日文符号和标点
             | '\u{FF00}'..='\u{FFEF}' // 全角 ASCII 和标点
             | '\u{4E00}'..='\u{9FFF}' // CJK 统一表意文字
+        )
+    }
+
+    fn is_kanji(&self) -> bool {
+        matches!(*self,
+            | '\u{3400}'..='\u{4dbf}' // CJK 扩展 A 区
+            | '\u{f900}'..='\u{faff}' // CJK 兼容表意文字
+            | '\u{4E00}'..='\u{9FFF}'
         )
     }
 }

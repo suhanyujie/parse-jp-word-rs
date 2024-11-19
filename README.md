@@ -9,3 +9,4 @@ Rust で 日本の単語の解析ツールです。
 * https://github.com/rust-bakery/nom/blob/main/doc/making_a_new_parser_from_scratch.md
 * https://github.com/suhanyujie/quick-start-rs
 * nom sql https://github.com/ms705/nom-sql/blob/master/src/parser.rs
+* - 更好的日文分词器实现 https://qiita.com/e10persona/items/fddc795e70a05f3bc907

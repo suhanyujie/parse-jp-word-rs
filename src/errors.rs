@@ -10,5 +10,8 @@ pub enum Error {
 
     #[error(transparent)]
     Normal(#[from] genanki_rs::Error),
+
+    #[error(transparent)]
+    LinderaErr(#[from] lindera::error::LinderaError),
 }
 
