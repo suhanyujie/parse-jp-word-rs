@@ -1,23 +1,26 @@
 use genanki_rs::{Field, Model, Template, Error, Deck, Note, Package};
+use crate::parser::jp_md::WordExplanation;
 use crate::prelude::*;
 
-pub fn create_apkg() -> Result<()> {
+pub fn create_apkg(word_list: Vec<(&str, &str)>) -> Result<()> {
     // 此 id 可以随便写，唯一即可。重要的是后续的牌组名称。
     let mut my_deck = Deck::new(2059400110,
-                                "学ぼうー日本語中級::漢字10",
+                                "学ぼうー日本語中級::test-1",
                                 "jp word learning.");
 
     let my_model = get_default_model()?;
-    let my_note = Note::new(my_model, vec![
-        "example-word",
-        "example-meaning",
-    ])?;
-    // add many note...
-    my_deck.add_note(my_note);
+
+    word_list.iter().for_each(|(word, meaning)| {
+        let note = Note::new(my_model.clone(), vec![
+            word.clone(),
+            meaning.clone(),
+        ]).expect("create note error.");
+        my_deck.add_note(note);
+    });
 
     // do package
     let mut pkg_obj = Package::new(vec![my_deck], vec![])?;
-    pkg_obj.write_to_file("output2014.apkg")?;
+    pkg_obj.write_to_file("./data/output2014.apkg")?;
     Ok(())
 }
 
@@ -32,4 +35,14 @@ pub fn get_default_model() -> Result<Model> {
     ]);
     my_model = my_model.css(" @font-face {font-family: IPAexGothic;src: url('_ipaexm.ttf');}}.card {font-family: 'IPAexGothic', 'Source Han Serif JP', arial;font-size: 22px;text-align: center;color: black;background-color: white;}.jp-word {font-family: 'IPAexGothic', 'BIZ UDMincho', 'Source Han Serif JP', 'Source Han Serif CN', serif, arial;text-align:center }.meaning{text-align:center }");
     Ok(my_model)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_apkg() {
+        let res = create_apkg(vec![("w1", "m1"), ("w2", "m2")]);
+    }
 }

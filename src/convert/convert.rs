@@ -12,7 +12,7 @@ use markdown::to_html;
 // ann -> Annotation
 pub fn convert_one_word_with_ann(word_str: &str) -> IResult<&str, String> {
     let (input, (_, word_part, _, reading_part, _)) = (tag("{"), take_until("|"), tag("|"), take_until("}"), tag("}")).parse(word_str)?;
-    // <ruby> 明日 <rp>(</rp><rt>Ashita</rt><rp>)</rp> </ruby>
+    // 「明日」->  `<ruby> 明日 <rp>(</rp><rt>あした</rt><rp>)</rp> </ruby>`
     let ruby_html = f!(
         "<ruby>{}<rp>(</rp><rt>{}</rt><rp>)</rp></ruby>",
         word_part, reading_part

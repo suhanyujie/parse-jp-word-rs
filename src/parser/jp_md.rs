@@ -1,6 +1,6 @@
 use nom::sequence::{preceded, Tuple};
 use nom::character::complete::{char, line_ending, not_line_ending, space1};
-use nom::{IResult, Parser, Err, error_position};
+use nom::{IResult, Parser};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::combinator::opt;
@@ -8,14 +8,7 @@ use nom::multi::{many0, many1};
 use nom::sequence::{delimited, pair};
 use crate::convert::convert::{convert_one_word_with_ann_and_extra_str, one_line_to_html};
 use crate::parser::parser::*;
-
-fn item_one_line(input: &str) -> IResult<&str, &str> {
-    todo!()
-}
-
-fn item_multi_line(input: &str) -> IResult<&str, &str> {
-    todo!()
-}
+use crate::prelude::*;
 
 pub fn parts_word1(input: &str) -> IResult<&str, &str> {
     let mut index = 0;
@@ -56,9 +49,6 @@ pub fn parts_item_line(input: &str) -> IResult<&str, (&str, &str, &str, (&str, &
     (tag("- "), parts_word1, tag("："), parts_meaning).parse(input)
 }
 
-fn parts_remark(input: &str) -> IResult<&str, &str> {
-    todo!()
-}
 
 pub fn markdown_link(input: &str) -> IResult<&str, (&str, &str)> {
     pair(
@@ -91,10 +81,19 @@ impl Default for WordExplanation {
 impl WordExplanation {
     // 转换单词，及其“意思”为 html
     pub fn convert(&mut self) {
+        self.is_converted = true;
         self.word = convert_one_word_with_ann_and_extra_str(self.word.as_str()).and_then(|(_, s)| Ok(s)).unwrap_or_default();
         self.explanation = one_line_to_html(self.explanation.as_str()).unwrap_or_default();
-        let new_subs: Vec<String> = self.sub_items.iter().map(|item| { one_line_to_html(&item).unwrap() }).collect();
-        self.sub_items = new_subs;
+        if self.sub_items.len() > 0 {
+            let new_subs: Vec<String> = self.sub_items.iter().map(|item| {
+                let mut ori_s = one_line_to_html(&item).unwrap();
+                ori_s = ori_s.replace("<p>", "<li>");
+                ori_s = ori_s.replace("</p>", "</li>");
+                ori_s
+            }).collect();
+            self.explanation = f!("{}{}", self.explanation, (&new_subs).clone().join(""));
+            self.sub_items = new_subs;
+        }
     }
 }
 
