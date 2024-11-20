@@ -23,7 +23,7 @@ fn run1() {
                 w.convert();
                 (w.word.as_str(), w.explanation.as_str())
             }).collect();
-            anki::anki::create_apkg(pair_list).expect("create anki apkg failed.");
+            anki::anki::create_apkg(pair_list, "学ぼうー日本語中級::test-1").expect("create anki apkg failed.");
         }
         Err(_) => { eprintln!("parse word list error.") }
     }

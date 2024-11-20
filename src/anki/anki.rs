@@ -1,11 +1,28 @@
-use genanki_rs::{Field, Model, Template, Error, Deck, Note, Package};
-use crate::parser::jp_md::WordExplanation;
+use genanki_rs::{Field, Model, Template, Deck, Note, Package};
+use crate::convert::jp_announce::convert_file;
 use crate::prelude::*;
 
-pub fn create_apkg(word_list: Vec<(&str, &str)>) -> Result<()> {
+// generate anki card for kanji and its word
+pub fn gen_anki_card_for_kanji() -> Result<()> {
+    let source_file = "./data/kanji.txt";
+    // generate word's announce
+    let (words_with_ann, meaning_list) = convert_file(source_file)?;
+    // get word's meaning
+    let list: Vec<(String, String)> = meaning_list.iter().enumerate().map(|(index, meaning_cont)| {
+        let mut infos: Vec<&str> = meaning_cont.as_str().split("：").collect();
+        let w = words_with_ann.get(index).expect("get word failed.");
+        (w.to_string(), infos.get(1).unwrap().to_string())
+    }).collect();
+    // gen anki card
+    let list_ref = list.iter().map(|(w, m)| (w.as_ref(), m.as_ref())).collect::<Vec<(&str, &str)>>();
+    let deck_name = "学ぼうー日本語中級::漢字10";
+    create_apkg(list_ref, deck_name)
+}
+
+pub fn create_apkg(word_list: Vec<(&str, &str)>, deck_name: &str) -> Result<()> {
     // 此 id 可以随便写，唯一即可。重要的是后续的牌组名称。
     let mut my_deck = Deck::new(2059400110,
-                                "学ぼうー日本語中級::test-1",
+                                deck_name,
                                 "jp word learning.");
 
     let my_model = get_default_model()?;
@@ -43,6 +60,12 @@ mod tests {
 
     #[test]
     fn test_create_apkg() {
-        let res = create_apkg(vec![("w1", "m1"), ("w2", "m2")]);
+        let res = create_apkg(vec![("w1", "m1"), ("w2", "m2")], "学ぼうー日本語中級::test-1");
+    }
+
+    #[test]
+    fn test_gen_anki_card_for_kanji() {
+        let res = gen_anki_card_for_kanji();
+        assert!(res.is_ok());
     }
 }
