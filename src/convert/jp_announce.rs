@@ -31,6 +31,9 @@ pub fn convert_words(input: &str) -> Result<Vec<String>> {
 }
 
 fn convert_one_word(line: &str) -> Result<String> {
+    if !has_kanji(line) {
+        return Ok(line.to_string());
+    }
     let dictionary = load_dictionary_from_kind(DictionaryKind::IPADIC)?;
     let segmenter = Segmenter::new(Mode::Normal, dictionary, Option::None);
     let tokenizer = Tokenizer::new(segmenter);
@@ -40,10 +43,19 @@ fn convert_one_word(line: &str) -> Result<String> {
     let mut new_str = String::new();
     for token in tokens.iter_mut() {
         let text = token.text.as_ref().to_string();
-        let reading = token.get_detail(7).unwrap().to_string();
+
+        let reading = if let Some(reading) = token.get_detail(7) {
+            reading
+        } else {
+            let s = text.clone();
+            eprintln!("error word：{:#?}", s);
+            text.as_ref()
+        };
+
+
         if has_kanji(text.as_str()) {
             let prefix_space = if index == 0 { "" } else { " " };
-            let part = f!("{}{}[{}]", prefix_space, text, str_to_hiragana(reading.as_str()));
+            let part = f!("{}{}[{}]", prefix_space, text, str_to_hiragana(reading.as_ref()));
             new_str.push_str(part.as_str());
         } else {
             new_str.push_str(text.as_str());

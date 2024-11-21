@@ -3,7 +3,7 @@ use crate::convert::jp_announce::convert_file;
 use crate::prelude::*;
 
 // generate anki card for kanji and its word
-pub fn gen_anki_card_for_kanji() -> Result<()> {
+pub fn gen_anki_card_for_kanji(deck_name: &str) -> Result<()> {
     let source_file = "./data/kanji.txt";
     // generate word's announce
     let (words_with_ann, meaning_list) = convert_file(source_file)?;
@@ -15,7 +15,6 @@ pub fn gen_anki_card_for_kanji() -> Result<()> {
     }).collect();
     // gen anki card
     let list_ref = list.iter().map(|(w, m)| (w.as_ref(), m.as_ref())).collect::<Vec<(&str, &str)>>();
-    let deck_name = "学ぼうー日本語中級::漢字10";
     create_apkg(list_ref, deck_name)
 }
 
@@ -65,7 +64,9 @@ mod tests {
 
     #[test]
     fn test_gen_anki_card_for_kanji() {
-        let res = gen_anki_card_for_kanji();
+        let deck_name = "学ぼうー日本語中級::漢字10";
+        let deck_name40 = "学ぼうー日本語中級::語彙40";
+        let res = gen_anki_card_for_kanji(deck_name40);
         assert!(res.is_ok());
     }
 }
