@@ -48,7 +48,7 @@ fn convert_one_word(line: &str) -> Result<String> {
             reading
         } else {
             let s = text.clone();
-            eprintln!("error word：{:#?}", s);
+            eprintln!("error word：{}, error char: {}", line, s);
             text.as_ref()
         };
 
