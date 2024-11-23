@@ -49,6 +49,9 @@ fn cli_main() {
         "goi" => {
             goi_handler(&args)
         }
+        "kanji" => {
+            kanji_handler(&args)
+        }
         _ => {
             eprintln!("not supported. ");
             Ok("error. ".to_string())
@@ -59,6 +62,15 @@ fn cli_main() {
 
 fn goi_handler(param: &Cli) -> Result<String> {
     let mut deck_name_prev = "学ぼうー日本語中級::語彙".to_string();
+    deck_name_prev.push_str(param.num.to_string().as_str());
+    let deck_name = deck_name_prev.as_str();
+    println!("convert anki card. deck name: {}", deck_name);
+    let res = gen_anki_card_for_kanji(param.file.as_str(), deck_name);
+    Ok("ok".to_string())
+}
+
+fn kanji_handler(param: &Cli) -> Result<String> {
+    let mut deck_name_prev = "学ぼうー日本語中級::漢字".to_string();
     deck_name_prev.push_str(param.num.to_string().as_str());
     let deck_name = deck_name_prev.as_str();
     println!("convert anki card. deck name: {}", deck_name);

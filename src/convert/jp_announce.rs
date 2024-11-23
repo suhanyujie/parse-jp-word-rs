@@ -46,6 +46,8 @@ fn convert_one_word(line: &str) -> Result<String> {
 
         let reading = if let Some(reading) = token.get_detail(7) {
             reading
+        } else if text.clone().is_ascii() {
+            text.as_ref()
         } else {
             let s = text.clone();
             eprintln!("error word：{}, error char: {}", line, s);
