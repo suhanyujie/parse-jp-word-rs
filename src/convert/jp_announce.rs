@@ -6,17 +6,17 @@ use lindera::dictionary::{
 };
 use crate::prelude::*;
 use crate::parser::jp_md::CharJpExt;
-use std::borrow::Borrow;
 
 pub fn convert_file(file_path: &str) -> Result<(Vec<String>, Vec<String>)> {
     let mut cont = std::fs::read_to_string(file_path)?;
     let mut meaning_list = vec![];
+    let mut tmp_word_cont = String::new();
     if cont.contains("---") {
-        let word_cont: Vec<String> = cont.split("---").map(|w| w.trim().to_string()).collect();
-        cont = word_cont[0].clone();
+        let word_cont: Vec<&str> = cont.split("---").map(|w| w.trim()).collect();
+        tmp_word_cont = word_cont[0].to_string();
         meaning_list = word_cont[1].lines().map(|w| w.trim().to_string()).collect();
     }
-    let word_list = convert_words(cont.as_str())?;
+    let word_list = convert_words(tmp_word_cont.as_str())?;
 
     Ok((word_list, meaning_list))
 }
