@@ -42,8 +42,9 @@ fn convert_one_word(line: &str) -> Result<String> {
     let mut index = 0;
     let mut new_str = String::new();
     for token in tokens.iter_mut() {
-        let text = token.text.as_ref().to_string();
+        // println!("{:#?}", token.details.clone());
 
+        let text = token.text.as_ref().to_string();
         let reading = if let Some(reading) = token.get_detail(7) {
             reading
         } else if text.clone().is_ascii() {
@@ -53,7 +54,6 @@ fn convert_one_word(line: &str) -> Result<String> {
             eprintln!("error word：{}, error char: {}", line, s);
             text.as_ref()
         };
-
 
         if has_kanji(text.as_str()) {
             let prefix_space = if index == 0 { "" } else { " " };
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_convert_one_word() {
-        let res = convert_one_word("東京スカイツリーの最寄り駅はとうきょうスカイツリー駅です");
+        let res = convert_one_word("聴導犬");
         println!("{:?}", res.unwrap());
     }
 
