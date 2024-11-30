@@ -18,6 +18,13 @@ mod anki;
 struct Cli {
     #[arg(short, long, default_value = "goi", help = "sub command type. eg: `goi`, `kanji` etc.")]
     sub: String,
+    #[arg(
+        short = 'b',
+        long = "book_name",
+        default_value = "学ぼうー日本語中級",
+        help = "book's name. eg: `学ぼうー日本語中級`, `学ぼうー日本語中上級` etc."
+    )]
+    book_name: String,
     #[arg(short, long, default_value = "21", help = "type's chapter number. eg: 21, 22 etc.")]
     num: usize,
     #[arg(
@@ -61,7 +68,8 @@ fn cli_main() {
 }
 
 fn goi_handler(param: &Cli) -> Result<String> {
-    let mut deck_name_prev = "学ぼうー日本語中級::語彙".to_string();
+    let book_name = param.book_name.as_str();
+    let mut deck_name_prev = f!("{}::語彙", book_name);
     deck_name_prev.push_str(param.num.to_string().as_str());
     let deck_name = deck_name_prev.as_str();
     println!("convert anki card. deck name: {}", deck_name);
@@ -70,7 +78,8 @@ fn goi_handler(param: &Cli) -> Result<String> {
 }
 
 fn kanji_handler(param: &Cli) -> Result<String> {
-    let mut deck_name_prev = "学ぼうー日本語中級::漢字".to_string();
+    let book_name = param.book_name.as_str();
+    let mut deck_name_prev = f!("{}::漢字", book_name);
     deck_name_prev.push_str(param.num.to_string().as_str());
     let deck_name = deck_name_prev.as_str();
     println!("convert anki card. deck name: {}", deck_name);
