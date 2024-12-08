@@ -2,6 +2,10 @@
 
 Rust で 日本の単語の解析ツールです。
 
+## eg
+- `parseJp2anki.exe -n=12 -f="./data/tmp.txt" -b="学ぼうー日本語中級" -s=kanji`
+- `parseJp2anki.exe -n=2 -f="./data/tmp.txt" -b="学ぼうー日本語中上級" -s=goi`
+
 ## 参考
 
 * https://imfeld.dev/writing/parsing_with_nom
