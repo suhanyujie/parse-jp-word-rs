@@ -22,14 +22,15 @@ struct Cli {
         short = 'b',
         long = "book_name",
         default_value = "学ぼうー日本語中級",
-        help = "book's name. eg: `学ぼうー日本語中級`, `学ぼうー日本語中上級` etc."
+        help = "book's name or deck name. eg: `学ぼうー日本語中級`, `学ぼうー日本語中上級` or `testDeck::01` etc."
     )]
     book_name: String,
     #[arg(short, long, default_value = "21", help = "type's chapter number. eg: 21, 22 etc.")]
     num: usize,
     #[arg(
         short, long,
-        help = "target file for parse. eg: `./data/kanji.txt`"
+        help = "target file for parse. eg: `./data/kanji.txt`",
+        default_value = "01"
     )]
     file: String,
 }
@@ -59,12 +60,24 @@ fn cli_main() {
         "kanji" => {
             kanji_handler(&args)
         }
+        "other" => {
+            other_handler(&args)
+        }
         _ => {
             eprintln!("not supported. ");
             Ok("error. ".to_string())
         }
     }.expect("execute failed");
     println!("{}", output);
+}
+
+fn other_handler(param: &Cli) -> Result<String> {
+    let book_name = param.book_name.as_str();
+    let mut deck_name_prev = f!("{}", book_name);
+    let deck_name = deck_name_prev.as_str();
+    println!("convert anki card. deck name: {}", deck_name);
+    let res = gen_anki_card_for_kanji(param.file.as_str(), deck_name);
+    Ok("ok".to_string())
 }
 
 fn goi_handler(param: &Cli) -> Result<String> {

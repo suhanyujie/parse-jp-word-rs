@@ -31,8 +31,8 @@ pub fn create_apkg(word_list: Vec<(&str, &str)>, deck_name: &str) -> Result<()> 
 
     word_list.iter().for_each(|(word, meaning)| {
         let note = Note::new(my_model.clone(), vec![
-            word.clone(),
-            meaning.clone(),
+            word,
+            meaning,
         ]).expect("create note error.");
         my_deck.add_note(note);
     });

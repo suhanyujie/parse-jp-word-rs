@@ -5,6 +5,7 @@ Rust で 日本の単語の解析ツールです。
 ## eg
 - `parseJp2anki.exe -f="./data/tmp.txt" -b="学ぼうー日本語中級" -s=kanji -n=12`
 - `parseJp2anki.exe -f="./data/tmp.txt" -b="学ぼうー日本語中上級" -s=goi -n=2`
+- `parseJp2anki.exe -f="./data/tmp.txt" -b="ビジネス日本語::日常词汇01" -s=other`
 
 ## 参考
 
