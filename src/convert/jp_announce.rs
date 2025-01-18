@@ -4,6 +4,7 @@ use lindera::tokenizer::Tokenizer;
 use lindera::dictionary::{
     load_dictionary_from_kind, DictionaryKind,
 };
+use regex::Regex;
 use crate::prelude::*;
 use crate::parser::jp_md::CharJpExt;
 
@@ -17,6 +18,25 @@ pub fn convert_file(file_path: &str) -> Result<(Vec<String>, Vec<String>)> {
         meaning_list = word_cont[1].lines().map(|w| w.trim().to_string()).collect();
     }
     let word_list = convert_words(tmp_word_cont.as_str())?;
+
+    Ok((word_list, meaning_list))
+}
+
+// todo
+pub fn convert_file_pattern_asm(file_path: &str) -> Result<(Vec<String>, Vec<String>)> {
+    let mut cont = std::fs::read_to_string(file_path)?;
+
+    let mut word_list = vec![];
+    let mut meaning_list = vec![];
+    cont.lines().map(|line| line.trim().to_string()).for_each(|w| {
+        if w.as_str().find('：').is_some() {
+            let tuple_res = w.split_once('：').expect("error jp word.");
+            let word = word_anon_convert(tuple_res.0.replace("- ", "").as_str());
+            let meaning = tuple_res.1.to_string();
+            word_list.push(word);
+            meaning_list.push(meaning);
+        }
+    });
 
     Ok((word_list, meaning_list))
 }
@@ -92,6 +112,15 @@ fn str_to_hiragana(s: &str) -> String {
     hiragana
 }
 
+// 日文注音转换。`{持|も}ち{主|ぬし}` => `持[も]ち 主[ぬし]` todo
+fn word_anon_convert(word: &str) -> String {
+    // 正则表达式匹配模式：捕获 {汉字|假名} 格式
+    let re = Regex::new(r"\{([^|]+)\|([^}]+)\}").unwrap();
+
+    // 替换模式：将 {汉字|假名} 替换为 汉字[假名]
+    re.replace_all(word, " $1[$2]").to_string()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -112,5 +141,12 @@ mod tests {
         let (res, _) = convert_file("./data/kanji.txt").unwrap();
         println!("{}", res.as_slice().join("\n"));
         assert!(res.len() > 0);
+    }
+
+    #[test]
+    fn test_word_anon_convert() {
+        let s1 = "{持|も}ち{主|ぬし}";
+        let res = word_anon_convert(s1);
+        println!("{:?}", res);
     }
 }

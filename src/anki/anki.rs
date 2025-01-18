@@ -1,5 +1,5 @@
 use genanki_rs::{Field, Model, Template, Deck, Note, Package};
-use crate::convert::jp_announce::convert_file;
+use crate::convert::jp_announce::{convert_file, convert_file_pattern_asm};
 use crate::prelude::*;
 
 // generate anki card for kanji and its word
@@ -15,6 +15,24 @@ pub fn gen_anki_card_for_kanji(from_file: &str, deck_name: &str) -> Result<()> {
         let mut infos: Vec<&str> = meaning_cont.as_str().split("：").collect();
         let w = words_with_ann.get(index).expect("get word failed.");
         (w.to_string(), infos.get(1).unwrap().to_string())
+    }).collect();
+    // gen anki card
+    let list_ref = list.iter().map(|(w, m)| (w.as_ref(), m.as_ref())).collect::<Vec<(&str, &str)>>();
+    create_apkg(list_ref, deck_name)
+}
+
+// parse line like this: word1: `- meaning01`
+pub fn gen_anki_card_for_kanji_pattern_asm(from_file: &str, deck_name: &str) -> Result<()> {
+    let mut source_file = from_file;
+    if source_file.len() < 1 {
+        source_file = "./data/kanji.txt";
+    }
+    // generate word's announce
+    let (words_with_ann, meaning_list) = convert_file_pattern_asm(source_file)?;
+    // get word's meaning
+    let list: Vec<(String, String)> = meaning_list.iter().enumerate().map(|(index, meaning_cont)| {
+        let w = words_with_ann.get(index).expect("get word failed.");
+        (w.to_string(), meaning_cont.to_string())
     }).collect();
     // gen anki card
     let list_ref = list.iter().map(|(w, m)| (w.as_ref(), m.as_ref())).collect::<Vec<(&str, &str)>>();
@@ -70,6 +88,13 @@ mod tests {
         let deck_name = "学ぼうー日本語中級::漢字10";
         let deck_name40 = "学ぼうー日本語中級::語彙21";
         let res = gen_anki_card_for_kanji("./data/kanji.txt", deck_name40);
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn test_gen_anki_card_for_kanji_pattern_asm() {
+        let deck_name40 = "test1::test";
+        let res = gen_anki_card_for_kanji_pattern_asm("./data/tmp.txt", deck_name40);
         assert!(res.is_ok());
     }
 }

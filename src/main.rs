@@ -1,4 +1,4 @@
-use crate::anki::anki::gen_anki_card_for_kanji;
+use crate::anki::anki::{gen_anki_card_for_kanji, gen_anki_card_for_kanji_pattern_asm};
 use crate::consts::*;
 use crate::parser::jp_md::*;
 use clap::{arg, Command, Parser, Subcommand};
@@ -33,6 +33,8 @@ struct Cli {
         default_value = "01"
     )]
     file: String,
+    #[arg(short, long, default_value = "queryAnon", help = "parse pattern. eg: `asm`, `queryAnon` etc.")]
+    pattern: String,
 }
 
 #[derive(Subcommand)]
@@ -76,7 +78,8 @@ fn other_handler(param: &Cli) -> Result<String> {
     let mut deck_name_prev = f!("{}", book_name);
     let deck_name = deck_name_prev.as_str();
     println!("convert anki card. deck name: {}", deck_name);
-    let res = gen_anki_card_for_kanji(param.file.as_str(), deck_name);
+    let pattern = param.pattern.as_str();
+    let res = gen_anki_card_for_kanji_pattern_asm(param.file.as_str(), deck_name);
     Ok("ok".to_string())
 }
 
