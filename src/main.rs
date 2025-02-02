@@ -103,8 +103,20 @@ fn kanji_handler(param: &Cli) -> Result<String> {
     Ok("ok".to_string())
 }
 
-fn run1() {
-    let input = STR1;
+fn run1(param: &Cli) -> Result<String> {
+    // let book_name = param.book_name.as_str();
+    // let deck_name = book_name;
+    // println!("convert anki card. deck name: {}", deck_name);
+    // let pattern = param.pattern.as_str();
+    // let res = gen_anki_card_for_kanji_pattern_asm(param.file.as_str(), deck_name);
+    // Ok("ok".to_string())
+
+    let mut source_file = param.file.as_str();
+    if source_file.len() < 1 {
+        source_file = "./data/tmp.txt";
+    }
+    let mut cont = std::fs::read_to_string(source_file)?;
+    let input = cont.as_ref();
     let list_res = parse_items(input).and_then(|(_, items)| { return Ok(items); });
     match list_res {
         Ok(mut list) => {
@@ -116,5 +128,7 @@ fn run1() {
         }
         Err(_) => { eprintln!("parse word list error.") }
     }
+
+    Ok("ok".to_string())
 }
 

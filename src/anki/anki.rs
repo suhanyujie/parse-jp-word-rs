@@ -1,5 +1,7 @@
 use genanki_rs::{Field, Model, Template, Deck, Note, Package};
+use crate::anki;
 use crate::convert::jp_announce::{convert_file, convert_file_pattern_asm};
+use crate::parser::jp_md::{parse_items, WordExplanation};
 use crate::prelude::*;
 
 // generate anki card for kanji and its word
@@ -21,8 +23,8 @@ pub fn gen_anki_card_for_kanji(from_file: &str, deck_name: &str) -> Result<()> {
     create_apkg(list_ref, deck_name)
 }
 
-// parse line like this: word1: `- meaning01`
-pub fn gen_anki_card_for_kanji_pattern_asm(from_file: &str, deck_name: &str) -> Result<()> {
+// parse line like this: `- word1:meaning01`
+pub fn gen_anki_card_for_kanji_pattern_asm_old(from_file: &str, deck_name: &str) -> Result<()> {
     let mut source_file = from_file;
     if source_file.len() < 1 {
         source_file = "./data/kanji.txt";
@@ -38,6 +40,31 @@ pub fn gen_anki_card_for_kanji_pattern_asm(from_file: &str, deck_name: &str) -> 
     let list_ref = list.iter().map(|(w, m)| (w.as_ref(), m.as_ref())).collect::<Vec<(&str, &str)>>();
     create_apkg(list_ref, deck_name)
 }
+
+// parse line like this: `- word1: meaning01`
+pub fn gen_anki_card_for_kanji_pattern_asm(from_file: &str, deck_name: &str) -> Result<()> {
+    let mut source_file = from_file;
+    if source_file.len() < 1 {
+        source_file = "./data/tmp.txt";
+    }
+    let mut cont = std::fs::read_to_string(source_file)?;
+    let input = cont.as_ref();
+    let list_res = parse_items(input).and_then(|(_, items)| { return Ok(items); });
+    match list_res {
+        Ok(mut list) => {
+            let pair_list: Vec<(&str, &str)> = list.as_mut_slice().into_iter().map(|w: &mut WordExplanation| {
+                w.convert();
+                (w.word.as_str(), w.explanation.as_str())
+            }).collect();
+            anki::anki::create_apkg(pair_list, deck_name).expect("create anki apkg failed.");
+        }
+        Err(_) => { eprintln!("parse word list error.") }
+    }
+
+    Ok(())
+}
+
+
 
 pub fn create_apkg(word_list: Vec<(&str, &str)>, deck_name: &str) -> Result<()> {
     // 此 id 可以随便写，唯一即可。重要的是后续的牌组名称。
@@ -57,7 +84,7 @@ pub fn create_apkg(word_list: Vec<(&str, &str)>, deck_name: &str) -> Result<()> 
 
     // do package
     let mut pkg_obj = Package::new(vec![my_deck], vec![])?;
-    pkg_obj.write_to_file("./data/output2014.apkg")?;
+    pkg_obj.write_to_file("./data/output2025.apkg")?;
     Ok(())
 }
 

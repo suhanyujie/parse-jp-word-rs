@@ -2,5 +2,6 @@
 .idea
 .vscode
 /data/output2014.apkg
+/data/*.apkg
 ./data/tmp.txt
 /data/tmp.txt
