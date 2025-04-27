@@ -43,12 +43,8 @@ enum Commands {
 }
 
 fn main() {
-    //parse_jp(STR1);
-    // run1();
     cli_main();
 }
-
-fn cli() {}
 
 fn cli_main() {
     // let matches = Command::new("jwa")
