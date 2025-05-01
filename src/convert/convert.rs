@@ -1,8 +1,8 @@
-use nom::sequence::{preceded, Tuple};
+use nom::sequence::Tuple;
 use nom::bytes::complete::{tag, take_until};
 use nom::{IResult, Parser};
 use nom::branch::{alt};
-use nom::multi::{many0, many1};
+use nom::multi::many1;
 use crate::parser::jp_md::{jp_string};
 use crate::prelude::*;
 use markdown::to_html;
@@ -23,7 +23,7 @@ pub fn convert_one_word_with_ann(word_str: &str) -> IResult<&str, String> {
 // word: `何が{一応|いちおう}ですか？`
 pub fn convert_one_word_with_ann_and_extra_str(word_str: &str) -> IResult<&str, String> {
     let (input, list) = many1(alt((jp_string, convert_one_word_with_ann))).parse(word_str)?;
-    let s = list.iter().fold(String::new(), |mut acc, d| acc + &d.to_string());
+    let s = list.iter().fold(String::new(), |acc, d| acc + &d.to_string());
     Ok((input, s))
 }
 

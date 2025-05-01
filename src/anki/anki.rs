@@ -14,7 +14,7 @@ pub fn gen_anki_card_for_kanji(from_file: &str, deck_name: &str) -> Result<()> {
     let (words_with_ann, meaning_list) = convert_file(source_file)?;
     // get word's meaning
     let list: Vec<(String, String)> = meaning_list.iter().enumerate().map(|(index, meaning_cont)| {
-        let mut infos: Vec<&str> = meaning_cont.as_str().split("：").collect();
+        let infos: Vec<&str> = meaning_cont.as_str().split("：").collect();
         let w = words_with_ann.get(index).expect("get word failed.");
         (w.to_string(), infos.get(1).unwrap().to_string())
     }).collect();
@@ -47,7 +47,7 @@ pub fn gen_anki_card_for_kanji_pattern_asm(from_file: &str, deck_name: &str) -> 
     if source_file.len() < 1 {
         source_file = "./data/tmp.txt";
     }
-    let mut cont = std::fs::read_to_string(source_file)?;
+    let cont = std::fs::read_to_string(source_file)?;
     let input = cont.as_ref();
     let list_res = parse_items(input).and_then(|(_, items)| { return Ok(items); });
     match list_res {

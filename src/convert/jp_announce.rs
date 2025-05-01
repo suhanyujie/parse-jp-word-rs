@@ -9,7 +9,7 @@ use crate::prelude::*;
 use crate::parser::jp_md::CharJpExt;
 
 pub fn convert_file(file_path: &str) -> Result<(Vec<String>, Vec<String>)> {
-    let mut cont = std::fs::read_to_string(file_path)?;
+    let cont = std::fs::read_to_string(file_path)?;
     let mut meaning_list = vec![];
     let mut tmp_word_cont = String::new();
     if cont.contains("---") {
@@ -24,7 +24,7 @@ pub fn convert_file(file_path: &str) -> Result<(Vec<String>, Vec<String>)> {
 
 // todo
 pub fn convert_file_pattern_asm(file_path: &str) -> Result<(Vec<String>, Vec<String>)> {
-    let mut cont = std::fs::read_to_string(file_path)?;
+    let cont = std::fs::read_to_string(file_path)?;
 
     let mut word_list = vec![];
     let mut meaning_list = vec![];

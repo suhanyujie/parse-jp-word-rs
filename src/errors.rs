@@ -1,4 +1,3 @@
-use std::fmt;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {

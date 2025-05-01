@@ -1,7 +1,6 @@
 use crate::anki::anki::{gen_anki_card_for_kanji, gen_anki_card_for_kanji_pattern_asm};
-use crate::consts::*;
 use crate::parser::jp_md::*;
-use clap::{arg, Command, Parser, Subcommand};
+use clap::{arg, Parser, Subcommand};
 use prelude::*;
 
 mod errors;
@@ -71,7 +70,7 @@ fn cli_main() {
 
 fn other_handler(param: &Cli) -> Result<String> {
     let book_name = param.book_name.as_str();
-    let mut deck_name_prev = f!("{}", book_name);
+    let deck_name_prev = f!("{}", book_name);
     let deck_name = deck_name_prev.as_str();
     println!("convert anki card. deck name: {}", deck_name);
     let pattern = param.pattern.as_str();
@@ -111,7 +110,7 @@ fn run1(param: &Cli) -> Result<String> {
     if source_file.len() < 1 {
         source_file = "./data/tmp.txt";
     }
-    let mut cont = std::fs::read_to_string(source_file)?;
+    let cont = std::fs::read_to_string(source_file)?;
     let input = cont.as_ref();
     let list_res = parse_items(input).and_then(|(_, items)| { return Ok(items); });
     match list_res {
